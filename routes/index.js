@@ -10,9 +10,9 @@ router.get('/', function(req, res){
 	res.render('index');
 });
 
-router.get('/scrape', function(req, res, next) {
+router.get('/scrape', function(req, res, next) { // Create our scrape data api
 
-    var url = 'http://money.cnn.com/data/hotstocks/index.html';
+    var url = 'http://money.cnn.com/data/hotstocks/index.html'; // URL we will be pulling stock data from
 
     // The structure of our request call
     // The first parameter is our URL
@@ -21,7 +21,9 @@ router.get('/scrape', function(req, res, next) {
 	request(url, function(error, response, html){
 		// First we'll check to make sure no errors occurred when making the request
 		if(!error){
-			var $ = cheerio.load(html);
+			var $ = cheerio.load(html); // Cheerio allows you to use jquery syntax on backend code, in this case the html we pulled from above url
+
+	        // Declare empty json objects, ready to receive data pulled from the html 
 	        var json = { stock : "", percent : "", change : "", price : ""};
 	        var json1 = { stock1 : "", percent1 : "", change1 : "", price1 : ""};
 	        var json2 = { stock2 : "", percent2 : "", change2 : "", price2 : ""};
@@ -36,12 +38,13 @@ router.get('/scrape', function(req, res, next) {
 	        var json11 = { stock11 : "", percent11 : "", change11 : "", price11 : ""};
 	        var json12 = { stock12 : "", percent12 : "", change12 : "", price12 : ""};
 
-	        $('.tickerDow').filter(function(){
+	        $('.tickerDow').filter(function(){ // Target .tickerDow class to start pulling specific data i want.
 	        	var stock = $(this).children().eq(0).text().replace(/^\s+|\s+$|\s+(?=\s)/g, '');
 	        	var percent = '(' + $(this).children().eq(4).text().replace(/^\s+|\s+$|\s+(?=\s)/g, '') + ')';
 	        	var change = $(this).children().eq(1).text().replace(/^\s+|\s+$|\s+(?=\s)/g, '');
 	        	var price = $(this).children().eq(3).text().replace(/^\s+|\s+$|\s+(?=\s)/g, '');
 
+	            // Push data just extracted to the empty object properties declared above.
 	            json.stock = stock;
 	            json.percent = percent;
 	            json.change = change;
@@ -69,7 +72,7 @@ router.get('/scrape', function(req, res, next) {
 
 	        });
 
-	        $('#wsod_hotStocks').filter(function(){
+	        $('#wsod_hotStocks').filter(function(){ // Target #wsod_hotStocks id to start pulling specific data i want.
 	        	var stock3 = $(this).children().eq(4).children().eq(1).children().eq(0).children().first().text().replace(/^\s+|\s+$|\s+(?=\s)/g, '');
 	        	var percent3 = '(' + $(this).children().eq(4).children().eq(1).children().eq(3).text().replace(/^\s+|\s+$|\s+(?=\s)/g, '') + ')';
 	        	var change3 = $(this).children().eq(4).children().eq(1).children().eq(2).text().replace(/^\s+|\s+$|\s+(?=\s)/g, '');
@@ -96,8 +99,8 @@ router.get('/scrape', function(req, res, next) {
 	        	var price5 = $(this).children().eq(4).children().eq(3).children().eq(1).text().replace(/^\s+|\s+$|\s+(?=\s)/g, '');
 
 	            json5.stock5 = stock5;
-	            json5.percent5 = "(-1.15%)";
-	            json5.change5 = "-0.13";
+	            json5.percent5 = percent5;
+	            json5.change5 = change5;
 	            json5.price5 = price5;
 
 	        	var stock6 = $(this).children().eq(4).children().eq(4).children().eq(0).children().first().text().replace(/^\s+|\s+$|\s+(?=\s)/g, '');
@@ -170,14 +173,15 @@ router.get('/scrape', function(req, res, next) {
 	            json12.change12 = change12;
 	            json12.price12 = price12;
 
-	    	}); // Closed Parent Filter Function
+	    	}); // Closed Filter Function
 
-		} //Closed Parent if Statement
+		} //Closed if Statement
 
+	    // Gather all json objects and place in Array called "together". Then make together Array endpoint available to grab using ajax
 	    var together = Array(json, json1, json2, json3, json4, json5, json6, json7, json8, json9, json10, json11, json12);		
 		res.json(together);
 
-	}); // Closed Parent Request Method
+	}); // Closed Request Method
 
 
 }); // Closed Scrape API
